@@ -1,0 +1,64 @@
+language: en-US
+early_access: false
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  review_status: true
+  auto_review:
+    enabled: true
+    drafts: false
+  path_instructions:
+    - path: "**"
+      instructions: |
+        Review for production correctness, not formatting or personal style.
+        Prioritize:
+        - authentication and authorization bypasses
+        - secret/token leakage
+        - injection (SQL, command, template, XSS, SSRF)
+        - insecure deserialization and path traversal
+        - payment, billing, quota, and financial logic
+        - destructive operations and data deletion
+        - race conditions, concurrency, idempotency, retries, and duplicate execution
+        - tenant/company data isolation
+        - sensitive data exposure in logs, telemetry, errors, URLs, and client bundles
+        - N+1 queries, unbounded queries, missing pagination, and avoidable performance regressions
+        - missing validation at trust boundaries
+        - unhandled failure modes and unsafe fallbacks
+        - backwards compatibility and database migration safety
+        - tests that fail to cover security-critical or business-critical paths
+        Ignore formatting and subjective style unless it creates a correctness or security problem.
+
+    - path: "server/**"
+      instructions: |
+        Treat server code as security-sensitive. Verify authz at the resource boundary,
+        tenant/company scoping, input validation, SQL/query safety, transaction boundaries,
+        idempotency, race conditions, auditability, and error handling.
+
+    - path: "server/**/auth/**"
+      instructions: |
+        Treat authentication and authorization changes as HIGH RISK. Look for privilege
+        escalation, session/token misuse, insecure defaults, missing CSRF protections where
+        applicable, confused-deputy behavior, and authorization checks performed too late.
+
+    - path: "server/**/billing/**"
+      instructions: |
+        Treat billing and quota logic as HIGH RISK. Check integer/decimal precision,
+        duplicate charges, retries, race conditions, authorization, and audit trails.
+
+    - path: "**/*migration*"
+      instructions: |
+        Treat schema/data migrations as HIGH RISK. Check rollback strategy, locking,
+        destructive changes, backfill safety, compatibility with old application versions,
+        and data-loss scenarios.
+
+    - path: "packages/**"
+      instructions: |
+        Check package boundaries and dependency changes for supply-chain risk,
+        unexpected permission expansion, unsafe transitive dependencies, and public API breakage.
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
